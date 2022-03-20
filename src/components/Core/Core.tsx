@@ -15,31 +15,45 @@ const defaultProps = {};
 type teamData = {
   color: number
   mintPrice: string,
-  newPrice: number
-  oldSupply: number
+  newPrice: number,
+  oldSupply: number,
+  nextPrice: number
 }
 
 const Core: React.FC<ICoreProps> = (props) => {
   const dispatch = useDispatch();
   const gameLogicContract = useSelector(getGameLogicContractProvider);
-  const [winner, setWinner] = useState(0);
+  const [winner, setWinnerColor] = useState(0);
 
   const [teams, setTeams] = useState<teamData[]>([]);
 
   useEffect(() => {
     getTeamsData();
     getWinner();
+    getPrice(1);
   }, [gameLogicContract]);
 
   const getWinner = async () => {
     if (!gameLogicContract) {
       return;
     }
+    const winnerRound = await gameLogicContract.winningRound();
+    const winnerColor = await gameLogicContract.winningColor();
+    const winnerStatus = await gameLogicContract.winningStatus();
+    console.log('winnerRound => ', parseInt(winnerRound.toString()));
+    console.log('winnerColor => ', parseInt(winnerColor.toString()));
+    console.log('winnerStatus => ', winnerStatus);
 
-    const winner = await gameLogicContract.winningRound();
-    console.log('WINNER => ',parseInt(winner.toString()));
-    setWinner(parseInt(winner.toString()));
-    setWinner(3);
+    setWinnerColor(parseInt(winnerColor.toString()));
+  };
+
+  const getPrice = async (color) => {
+    if (!gameLogicContract) {
+      return;
+    }
+    const priceData = await gameLogicContract.votingPrice(color);
+    console.log('PRICE (ETHER) => ', priceData);
+    return priceData.toString();
   };
 
   const getTeamsData = async () => {
@@ -53,11 +67,13 @@ const Core: React.FC<ICoreProps> = (props) => {
       const teamData = await gameLogicContract.colorToNFT(index);
       console.log("TEAM INDEX => ", index, teamData);
       const price = ethers.utils.formatEther(teamData.mintPrice.toString());
+      const nextPrice = await gameLogicContract.votingPrice(parseFloat(teamData.color.toString()));
       const team = {
         color: parseInt(teamData.color.toString()),
         mintPrice: price,
         newPrice: parseFloat(price) + parseFloat(price) / 5,
-        oldSupply: parseInt(teamData.oldSupply.toString())
+        oldSupply: parseInt(teamData.oldSupply.toString()),
+        nextPrice: ethers.utils.formatEther(nextPrice)
       };
       teams.push(team);
     }
@@ -65,8 +81,9 @@ const Core: React.FC<ICoreProps> = (props) => {
     setTeams(teams);
   };
 
-  const vote = (color, price) => {
-    console.log(color, price);
+  const vote = async (color) => {
+    const price = await getPrice(color);
+    console.log(price);
     dispatch(cleanTxState());
     dispatch(submitPayableTx(
       {
@@ -76,7 +93,7 @@ const Core: React.FC<ICoreProps> = (props) => {
         ],
         overrides: {
           // the value could be a number, or a
-          value: ethers.utils.parseEther(price)
+          value: price
         },
         name: "Vote",
         contract: gameLogicContract
@@ -118,19 +135,20 @@ const Core: React.FC<ICoreProps> = (props) => {
     <section className={"relative flex justify-center items-end h-screen w-screen bg-slate-200"}>
       <div className="max-w-screen-md pb-14 w-full h-full flex items-end justify-between">
         {teams.length > 0 ? teams.map((team, i) => {
+
           return <div className={"flex flex-col items-center"}>
-            {team.color === winner && <div className={" mb-16 text-6xl"}>
-                🎉
-            </div>}
             {teamStack(team, i)}
             <section className={"mb-2"}>
+              {team.color === winner && <div className={"text-6xl my-4"}>
+                  🎉
+              </div>}
               <h3 className={"text-2xl flex"}>
-                {team.oldSupply !== 0 ? team.newPrice : team.mintPrice} <p className={"pl-2"}>Ξ</p>
+                {team.nextPrice} <p className={"pl-2"}>Ξ</p>
               </h3>
             </section>
             <button
               onClick={() => {
-                vote(i + 1, team.oldSupply !== 0 ? team.newPrice.toString() : team.mintPrice);
+                vote(i + 1);
               }}
               className={"hover:shadow hover:border-black border text-grey-400 tracking-wide border-4 rounded-lg bg-white w-32 h-12 items-center flex justify-center"}>
               <h2 className={"text-gray-400 hover:text-gray-800"}>Add card</h2>
