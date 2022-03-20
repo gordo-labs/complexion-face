@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { cleanTxState, submitPayableTx } from "../../features/transaction/transactionActions";
 import { ethers } from "ethers";
 import { getGameLogicContractProvider } from "../../features/contract/contractReducers";
+import complexion from "../../assets/complexion.svg"
 
 type ICoreProps = {}
 
@@ -115,10 +116,10 @@ const Core: React.FC<ICoreProps> = (props) => {
 
   return (
     <section className={"relative flex justify-center items-end h-screen w-screen bg-slate-200"}>
-      <div className="max-w-screen-md pb-14 w-full flex items-center justify-between">
-        {teams.map((team, i) => {
+      <div className="max-w-screen-md pb-14 w-full h-full flex items-end justify-between">
+        {teams.length > 0 ? teams.map((team, i) => {
           return <div className={"flex flex-col items-center"}>
-            {team.color === winner && <div className={"mb-16 text-6xl"}>
+            {team.color === winner && <div className={" mb-16 text-6xl"}>
                 🎉
             </div>}
             {teamStack(team, i)}
@@ -135,7 +136,12 @@ const Core: React.FC<ICoreProps> = (props) => {
               <h2 className={"text-gray-400 hover:text-gray-800"}>Add card</h2>
             </button>
           </div>;
-        })}
+        })
+          : <div className={"h-full w-full flex flex-col items-center justify-center"}>
+              <img src={complexion} alt={""}/>
+            <h2 className={"mt-10 text-2xl text-gray-500 tracking-wider"}>Connect your wallet</h2>
+          </div>
+        }
       </div>
     </section>
   );

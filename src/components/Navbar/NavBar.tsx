@@ -113,12 +113,12 @@ const NavBar: React.FC<INavBarProps> = ({}) => {
             <Account /> :
             <button
               className={cx(
-                "px-6 py-1 text-sm", styles.connectBtn
+                "px-6 py-1 text-sm mt-2", styles.connectBtn
               )}
               onClick={() => {
                 loadLibrary();
               }}>
-              Connect
+              <h3 className={"tracking-wider"}>Connect</h3>
             </button>
           }
 
@@ -131,7 +131,7 @@ const NavBar: React.FC<INavBarProps> = ({}) => {
               </>
               :
               <p className={"text-xs text-gray-500"}>
-                Connect your <a className="underline" href="https://metamask.io/" target="_blank">metamask</a>*
+{/*                Connect your <a className="underline" href="https://metamask.io/" target="_blank">metamask</a>**/}
               </p>
             }
           </div>
