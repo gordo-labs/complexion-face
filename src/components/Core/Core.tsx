@@ -19,7 +19,6 @@ type teamData = {
 }
 
 const Core: React.FC<ICoreProps> = (props) => {
-  const {} = props;
   const dispatch = useDispatch();
   const gameLogicContract = useSelector(getGameLogicContractProvider);
   const [winner, setWinner] = useState(0);
