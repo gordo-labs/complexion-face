@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import cx from "classnames";
 import styles from "./core.module.scss";
-import { useDispatch, useSelector } from "react-redux";
-import { cleanTxState, submitPayableTx } from "../../features/transaction/transactionActions";
-import { ethers } from "ethers";
-import { getGameLogicContractProvider } from "../../features/contract/contractReducers";
+import {useDispatch, useSelector} from "react-redux";
+import {cleanTxState, submitPayableTx} from "../../features/transaction/transactionActions";
+import {ethers} from "ethers";
+import {getGameLogicContractProvider} from "../../features/contract/contractReducers";
 import complexion from "../../assets/complexion.svg"
 
 type ICoreProps = {}
@@ -23,7 +23,7 @@ type teamData = {
 const Core: React.FC<ICoreProps> = (props) => {
   const dispatch = useDispatch();
   const gameLogicContract = useSelector(getGameLogicContractProvider);
-  const [winner, setWinnerColor] = useState(0);
+  const [winner, setWinner] = useState<{ color: number, round: number, status: boolean }>();
 
   const [teams, setTeams] = useState<teamData[]>([]);
 
@@ -44,7 +44,12 @@ const Core: React.FC<ICoreProps> = (props) => {
     console.log('winnerColor => ', parseInt(winnerColor.toString()));
     console.log('winnerStatus => ', winnerStatus);
 
-    setWinnerColor(parseInt(winnerColor.toString()));
+    setWinner({
+        color: parseInt(winnerColor.toString()),
+        round: parseInt(winnerRound.toString()),
+        status: winnerStatus
+      }
+    );
   };
 
   const getPrice = async (color) => {
@@ -133,30 +138,35 @@ const Core: React.FC<ICoreProps> = (props) => {
 
   return (
     <section className={"relative flex justify-center items-end h-screen w-screen bg-slate-200"}>
+
+      {winner && winner.status && <div className={"text-2xl flex justify-center flex-col items-center absolute top-10 items-my-4"}>
+          <h3>Team {winner.color} won round {winner.round}</h3>
+          <h2>Congrats 🎉</h2>
+      </div>}
       <div className="max-w-screen-md pb-14 w-full h-full flex items-end justify-between">
         {teams.length > 0 ? teams.map((team, i) => {
 
-          return <div className={"flex flex-col items-center"}>
-            {teamStack(team, i)}
-            <section className={"mb-2"}>
-              {team.color === winner && <div className={"text-6xl my-4"}>
-                  🎉
-              </div>}
-              <h3 className={"text-2xl flex"}>
-                {team.nextPrice} <p className={"pl-2"}>Ξ</p>
-              </h3>
-            </section>
-            <button
-              onClick={() => {
-                vote(i + 1);
-              }}
-              className={"hover:shadow hover:border-black border text-grey-400 tracking-wide border-4 rounded-lg bg-white w-32 h-12 items-center flex justify-center"}>
-              <h2 className={"text-gray-400 hover:text-gray-800"}>Add card</h2>
-            </button>
-          </div>;
-        })
+            return <div className={"flex flex-col items-center"}>
+              {teamStack(team, i)}
+              <section className={"mb-2"}>
+                {team.color === winner.color && <div className={"text-6xl my-4"}>
+                    🎉
+                </div>}
+                <h3 className={"text-2xl flex"}>
+                  {team.nextPrice} <p className={"pl-2"}>Ξ</p>
+                </h3>
+              </section>
+              <button
+                onClick={() => {
+                  vote(i + 1);
+                }}
+                className={"hover:shadow hover:border-black border text-grey-400 tracking-wide border-4 rounded-lg bg-white w-32 h-12 items-center flex justify-center"}>
+                <h2 className={"text-gray-400 hover:text-gray-800"}>Add card</h2>
+              </button>
+            </div>;
+          })
           : <div className={"h-full w-full flex flex-col items-center justify-center"}>
-              <img src={complexion} alt={""}/>
+            <img src={complexion} alt={""}/>
             <h2 className={"mt-10 text-2xl text-gray-500 tracking-wider"}>Connect your wallet</h2>
           </div>
         }

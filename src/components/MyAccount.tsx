@@ -62,6 +62,9 @@ const MyAccount: React.FC<IMyAccountProps> = (props) => {
   };
 
   const getVoterData = async () => {
+    if (!gameLogicContract) {
+      return;
+    }
     const round = await gameLogicContract.roundNumber();
     const roundVoter = await gameLogicContract.roundToVoter(account, round);
     console.log("VOTER DATA => 7", roundVoter);

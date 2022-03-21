@@ -42,6 +42,7 @@ const Round: React.FC<IRoundProps> = (props) => {
       return;
     }
     const round = await gameLogicContract.roundNumber();
+    const resetTime = await gameLogicContract.resetTime();
     console.log("Round => ", round.toString());
     // setRound(parseInt(round.toString()));
     setRound(parseInt(round.toString()));
