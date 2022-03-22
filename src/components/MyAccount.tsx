@@ -110,7 +110,7 @@ const MyAccount: React.FC<IMyAccountProps> = (props) => {
       {/*VOTER*/}
       {voter && winner && <div>
         {
-          voter.voted ?
+          winner && winner.status && winner.color === voter.color ?
             <>
               <div className={"text-right"}>
 
@@ -119,7 +119,7 @@ const MyAccount: React.FC<IMyAccountProps> = (props) => {
               </div>
             </>
             :
-            winner && winner.status && winner.color === voter.color ?
+            voter.voted ?
             <>
               <h3 className={"mb-2 flex items-center "}>Voted
                 <span className={"ml-2  border border-black border-2 rounded h-5 w-5"} style={{

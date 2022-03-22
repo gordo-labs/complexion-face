@@ -171,10 +171,15 @@ const Core: React.FC<ICoreProps> = (props) => {
   return (
     <section className={"relative flex justify-center items-end h-screen w-screen bg-slate-200"}>
 
-      {winner && winner.status && <div className={"text-2xl flex justify-center flex-col items-center absolute top-10 items-my-4"}>
+      {winner && winner.status ? <div className={"text-2xl flex justify-center flex-col items-center absolute top-10 items-my-4"}>
           <h3 className={"mb-2 flex items-center"}>Team {paintWinner(winner)} won round {winner.round}</h3>
           <h2>Congrats 🎉</h2>
-      </div>}
+      </div> :
+        <div className={"text-2xl flex justify-center flex-col items-center absolute top-10 items-my-4"}>
+          <h3 className={"tracking-wider"}>Wins first team reaching 10</h3>
+          <h2 className={"tracking-wider"}>Winner team decides</h2>
+        </div>
+      }
       <div className="max-w-screen-md pb-14 w-full h-full flex items-end justify-between">
         {teams.length > 0 ? teams.map((team, i) => {
 

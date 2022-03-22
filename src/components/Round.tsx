@@ -124,13 +124,13 @@ const Round: React.FC<IRoundProps> = (props) => {
           nextRound();
         }}
         className={cx("mt-4 hover:shadow border-black border tracking-wide border-4 rounded-lg bg-white w-44 h-12 items-center flex justify-center",
-          blockTime < resetTime && "opacity-40 cursor-default")}>
+          blockTime > resetTime && winner && !winner.status && "opacity-40 cursor-default")}>
         <h2 className={""}>Next round</h2>
       </button>
-      <div className={"mt-4"}>
+      {winner && winner.status && <div className={"mt-4"}>
         <p>Next round will be able to start in:</p>
         <h3 className={"tracking-wider"}>{remainingResetTime}</h3>
-      </div>
+      </div>}
     </div>
   );
 };
