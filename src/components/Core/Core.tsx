@@ -106,6 +106,8 @@ const Core: React.FC<ICoreProps> = (props) => {
     ));
   };
 
+
+
   const teamStack = (data: teamData, index: number) => {
     const list = Array.from(Array(data.oldSupply).keys());
     return <div key={index} className={"relative flex flex-col h-32 w-36 mb-10"}>
@@ -115,7 +117,7 @@ const Core: React.FC<ICoreProps> = (props) => {
             <section key={data.oldSupply}>
               <div
                 style={{
-                  bottom: 30 * i,
+                  bottom: 23 * i,
                   backgroundColor:
                     index === 0 ? "#F16161" :
                       index === 1 ? "#66B1DC" :
@@ -136,32 +138,71 @@ const Core: React.FC<ICoreProps> = (props) => {
     </div>;
   };
 
+  const paintWinner = (winner) => {
+    return (
+      <React.Fragment>
+            <span className={"mx-2 border border-black border-2 rounded h-6 w-6"} style={{
+              backgroundColor:
+                winner.color === 1 ? "#F16161" :
+                  winner.color === 2 ? "#66B1DC" :
+                    winner.color === 3 ? "#7FEFAC" :
+                      winner.color === 4 ? "#F9E958" :
+                        "white"
+            }} />
+      </React.Fragment>
+    )
+  }
+
+  const traduceColor = (color) => {
+    return color === 1 ? "#F16161" :
+      color === 2 ? "#66B1DC" :
+        color === 3 ? "#7FEFAC" :
+          color === 4 ? "#F9E958" :
+            "white";
+  }
+
+  const traduceTeam = (team) => <>{
+    team.color === 1 ? "RED" :
+      team.color === 2 ? "BLUE" :
+      team.color === 3 ? "GREEN" :
+      team.color === 4 ? "YELLOW" : ""
+  }</>
+
   return (
     <section className={"relative flex justify-center items-end h-screen w-screen bg-slate-200"}>
 
-      {winner && winner.status && <div className={"text-2xl flex justify-center flex-col items-center absolute top-10 items-my-4"}>
-          <h3>Team {winner.color} won round {winner.round}</h3>
+      {winner && winner.status ? <div className={"text-2xl flex justify-center flex-col items-center absolute top-10 items-my-4"}>
+          <h3 className={"mb-2 flex items-center"}>Team {paintWinner(winner)} won round {winner.round}</h3>
           <h2>Congrats 🎉</h2>
-      </div>}
+      </div> :
+        <div className={"text-2xl flex justify-center flex-col items-center absolute top-10 items-my-4"}>
+          <h3 className={"tracking-wider"}>Wins first team reaching 10</h3>
+          <h2 className={"tracking-wider"}>Winner team decides</h2>
+        </div>
+      }
       <div className="max-w-screen-md pb-14 w-full h-full flex items-end justify-between">
         {teams.length > 0 ? teams.map((team, i) => {
 
             return <div className={"flex flex-col items-center"}>
               {teamStack(team, i)}
               <section className={"mb-2"}>
-                {team.color === winner.color && <div className={"text-6xl my-4"}>
+{/*                {team.color === winner.color && <div className={"text-6xl my-4"}>
                     🎉
-                </div>}
+                </div>}*/}
                 <h3 className={"text-2xl flex"}>
                   {team.nextPrice} <p className={"pl-2"}>Ξ</p>
                 </h3>
               </section>
               <button
                 onClick={() => {
-                  vote(i + 1);
+                  !winner.status && vote(i + 1);
                 }}
-                className={"hover:shadow hover:border-black border text-grey-400 tracking-wide border-4 rounded-lg bg-white w-32 h-12 items-center flex justify-center"}>
-                <h2 className={"text-gray-400 hover:text-gray-800"}>Add card</h2>
+                style={{
+                  backgroundColor: !winner.status && traduceColor(team.color),
+                }}
+                className={cx("hover:shadow border-black border tracking-wide border-4 rounded-lg bg-white w-44 h-12 items-center flex justify-center", winner.status && "opacity-40 cursor-default")}>
+                <h2 className={"text-gray-800"} style={{
+                }}>Vote for {traduceTeam(team)}</h2>
               </button>
             </div>;
           })

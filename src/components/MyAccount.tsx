@@ -5,6 +5,7 @@ import { cleanTxState, submitPayableTx } from "../features/transaction/transacti
 import { ethers } from "ethers";
 import { Account } from "./Web3Provider/DataLoaders/dataLoaders";
 import { useWeb3React } from "@web3-react/core";
+import cx from "classnames";
 
 type IMyAccountProps = {}
 
@@ -24,6 +25,8 @@ const MyAccount: React.FC<IMyAccountProps> = (props) => {
   const gameLogicContract = useSelector(getGameLogicContractProvider);
   const { account } = useWeb3React();
   const [voter, setVoter] = useState<Voter>();
+  const [winner, setWinner] = useState<{ color: number, round: number, status: boolean }>();
+
 
   const claimReward = () => {
     dispatch(cleanTxState());
@@ -78,16 +81,45 @@ const MyAccount: React.FC<IMyAccountProps> = (props) => {
     setVoter(voter);
   };
 
+  const getWinner = async () => {
+    if (!gameLogicContract) {
+      return;
+    }
+    const winnerRound = await gameLogicContract.winningRound();
+    const winnerColor = await gameLogicContract.winningColor();
+    const winnerStatus = await gameLogicContract.winningStatus();
+    console.log('winnerRound => ', parseInt(winnerRound.toString()));
+    console.log('winnerColor => ', parseInt(winnerColor.toString()));
+    console.log('winnerStatus => ', winnerStatus);
+
+    setWinner({
+        color: parseInt(winnerColor.toString()),
+        round: parseInt(winnerRound.toString()),
+        status: winnerStatus
+      }
+    );
+  };
+
   useEffect(() => {
     getVoterData();
+    getWinner();
   }, [gameLogicContract]);
 
   return (
     <div className={"absolute flex flex-col items-end top-16 right-6 z-10"}>
       {/*VOTER*/}
-      {voter && <div>
+      {voter && winner && <div>
         {
-          voter.voted ?
+          winner && winner.status && winner.color === voter.color ?
+            <>
+              <div className={"text-right"}>
+
+              <p>Congrats Winner!</p>
+              <h3 className={"tracking-wider mt-2 text-2xl"}>Earn or Mint!</h3>
+              </div>
+            </>
+            :
+            voter.voted ?
             <>
               <h3 className={"mb-2 flex items-center "}>Voted
                 <span className={"ml-2  border border-black border-2 rounded h-5 w-5"} style={{
@@ -100,7 +132,7 @@ const MyAccount: React.FC<IMyAccountProps> = (props) => {
                 }} />
               </h3>
             </>
-            :
+              :
             <>
               <h4>Join a team to participate</h4>
             </>
@@ -112,16 +144,16 @@ const MyAccount: React.FC<IMyAccountProps> = (props) => {
           // vote(i + 1, team.mintPrice);
           claimReward();
         }}
-        className={"mb-2 hover:shadow hover:border-black border text-grey-400 tracking-wide border-4 rounded-lg bg-white w-40 h-12 items-center flex justify-center"}>
-        <h2 className={"text-gray-400 hover:text-gray-800"}>Claim Reward</h2>
+        className={cx("mt-4 hover:shadow border-black border tracking-wide border-4 rounded-lg bg-white w-44 h-12 items-center flex justify-center", winner && !winner.status && "opacity-40 cursor-default")}>
+        <h2 className={""}>Claim Reward</h2>
       </button>
       <button
         onClick={() => {
           // vote(i + 1, team.mintPrice);
           mint();
         }}
-        className={"mb-2 hover:shadow hover:border-black border text-grey-400 tracking-wide border-4 rounded-lg bg-white w-40 h-12 items-center flex justify-center"}>
-        <h2 className={"text-gray-400 hover:text-gray-800"}>Mint</h2>
+        className={cx("mt-4 hover:shadow border-black border tracking-wide border-4 rounded-lg bg-white w-44 h-12 items-center flex justify-center", winner && !winner.status && "opacity-40 cursor-default")}>
+        <h2 className={""}>Mint</h2>
       </button>
     </div>
   );
