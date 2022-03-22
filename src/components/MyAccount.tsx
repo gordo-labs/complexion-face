@@ -145,7 +145,7 @@ const MyAccount: React.FC<IMyAccountProps> = (props) => {
           claimReward();
         }}
         className={cx("mt-4 hover:shadow border-black border tracking-wide border-4 rounded-lg bg-white w-44 h-12 items-center flex justify-center", winner && !winner.status && "opacity-40 cursor-default")}>
-        <h2 className={""}>Claim Reward</h2>
+        <h2 className={""}>Earn</h2>
       </button>
       <button
         onClick={() => {
