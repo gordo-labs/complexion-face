@@ -176,8 +176,8 @@ const Core: React.FC<ICoreProps> = (props) => {
           <h2>Congrats 🎉</h2>
       </div> :
         <div className={"text-2xl flex justify-center flex-col items-center absolute top-10 items-my-4"}>
-          <h3 className={"tracking-wider"}>Wins first team reaching 10</h3>
-          <h2 className={"tracking-wider"}>Winner team decides</h2>
+          <h3 className={"tracking-wider"}>First Team to Reach 10 Wins!</h3>
+          <h2 className={"tracking-wider"}></h2>
         </div>
       }
       <div className="max-w-screen-md pb-14 w-full h-full flex items-end justify-between">
